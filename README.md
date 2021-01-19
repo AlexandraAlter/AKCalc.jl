@@ -1,1 +1,1 @@
-# arknights-stats
+# ArknightsStats.jl
