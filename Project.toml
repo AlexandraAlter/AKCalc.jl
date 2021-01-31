@@ -1,0 +1,12 @@
+name = "AKCalc"
+uuid = "a9f42fc8-5007-4d91-98a3-1751f35471f2"
+authors = ["AlexandraAlter <alexandra.alter@protonmail.com>"]
+version = "0.1.0"
+
+[deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
+SQLite = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
+Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
+YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
