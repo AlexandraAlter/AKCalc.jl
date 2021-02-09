@@ -1,20 +1,18 @@
-struct LocalDB
-  sqlite::SQLite.DB
+using SQLite
 
-  function LocalDB(file::AbstractString)
+struct SourceInSQL <: Source
+  db::SQLite.DB
+  cache::SourceInMem
+
+  function SourceInSQL(file::AbstractString)
     db = new(SQLite.DB(file))
-    _localdb_init(db)
+    init(db)
     return db
   end
 end
-LocalDB() = LocalDB(":memory:")
+SourceInSQL() = SourceInSQL(":memory:")
 
-SourceKind(::LocalDB) = MultiSourceData()
-has_const_data(::LocalDB) = true
-has_stats_data(::LocalDB) = true
-has_player_data(::LocalDB) = true
-
-function _localdb_haspatch(db::LocalDB, patch::Int)
+function haspatch(db::SourceInSQL, patch::Int)
   stmt = DBInterface.prepare(db.sqlite, """
     SELECT * FROM meta WHERE patch = ?;
   """)
@@ -22,7 +20,7 @@ function _localdb_haspatch(db::LocalDB, patch::Int)
   return length(result) > 0
 end
 
-function _localdb_addpatch(db::LocalDB, patch::Int,
+function addpatch(db::SourceInSQL, patch::Int,
     notes::AbstractString, sql::AbstractString)
   stmt = DBInterface.prepare(db.sqlite, """
     INSERT INTO meta VALUES(?, ?, ?, ?)")
@@ -37,7 +35,7 @@ function _localdb_addpatch(db::LocalDB, patch::Int,
   end
 end
 
-function _localdb_init(db::LocalDB)
+function init(db::SourceInSQL)
   DBInterface.execute(db.sqlite, """
     PRAGMA foreign_keys = ON;
   """)
@@ -138,23 +136,4 @@ function _localdb_init(db::LocalDB)
     );
   """)
 end
-
-function sources(db::LocalDB)
-  return DBInterface.execute(db.sqlite, """
-    SELECT * FROM sources;
-  """) |> DataFrame
-end
-
-function merge_sources!(db::LocalDB, sources::)
-  return DBInterface.execute(db.sqlite, """
-    SELECT * FROM sources;
-  """) |> DataFrame
-end
-
-function resource_types(db::LocalDB)
-  return DBInterface.execute(db.sqlite, """
-    SELECT * FROM resource_types;
-  """) |> DataFrame
-end
-
 
