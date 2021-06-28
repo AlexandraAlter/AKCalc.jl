@@ -7,7 +7,10 @@ using Dates
 
 using AKCalc
 
-export GDKengxxiao, GDAceShip
+export GDMem, GDKengxxiao, GDAceShip
+
+export resource_types, factory_recipes, workshop_recipes, operator_bases
+export enemy_bases, enemies, tiles, maps, stages
 
 include("gamedata_types.jl")
 
@@ -37,11 +40,22 @@ mutable struct SourceInMem <: Source
   tiles::Union{Array{Tile}, Nothing}
   maps::Union{Array{Map}, Nothing}
   stages::Union{Array{Stage}, Nothing}
-
-  function SourceInMem()
-    return new(nothing, nothing, nothing, nothing, nothing, nothing, nothing, nothing, nothing)
-  end
 end
+SourceInMem() = SourceInMem(nothing, nothing, nothing, nothing, nothing, nothing, nothing, nothing, nothing)
+
+_comb(arr...) = vcat(filter(x -> !isnothing(x), arr)...)
+
+resource_types(s::SourceInMem) = s.resource_types
+factory_recipes(s::SourceInMem) = s.factory_recipes
+workshop_recipes(s::SourceInMem) = s.workshop_recipes
+operator_bases(s::SourceInMem) = s.operator_bases
+Base.append!(s::SourceInMem, bases::Array{OperatorBase}) =
+  s.operator_bases = _comb(s.operator_bases, bases)
+enemy_bases(s::SourceInMem) = s.enemy_bases
+enemies(s::SourceInMem) = s.enemies
+tiles(s::SourceInMem) = s.tiles
+maps(s::SourceInMem) = s.maps
+stages(s::SourceInMem) = s.stages
 
 """
   GameData Source that caches results in memory, or falls back on another provided source.
@@ -237,7 +251,7 @@ function resource_types(source::Source)
   return items
 end
 
-GDMem() = SourceInMem()
+const GDMem = SourceInMem
 const GDKengxxiao = SourceCache(SourceByURL("https://raw.githubusercontent.com/Kengxxiao/ArknightsGameData/master", LANGS[:en]))
 const GDAceShip = SourceByURL("https://raw.githubusercontent.com/Aceship/AN-EN-Tags/master/json/gamedata", LANGS[:en])
 

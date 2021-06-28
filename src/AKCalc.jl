@@ -9,14 +9,14 @@ export @ak_str
 
 # accessors
 export resource_types, factory_recipes, workshop_recipes, operator_bases
-export enemy_bases, enemies, tiles, maps, stages, stage_reports, resources
-export operators
+export enemy_bases, enemies, tiles, maps, stages, stage_reports
+export operators, resources
 
 # AK types
 export ResourceItemType, ResourceClassType, ResourceType, Resource
 export FactoryRecipe, WorkshopRecipe
 export AtkType, DmgType, Resistances
-export PromotionPhase, OperatorBase, OperatorLevel, Operator
+export PromotionPhase, OperatorBase, OperatorLevel, OperatorSkills, Operator
 export EnemyFlags, EnemyRank, EnemyGrade, EnemyBase, EnemyStats
 export Tile, Map, DropRarity, Stage
 export StageReport, RecruitReport

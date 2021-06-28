@@ -46,7 +46,7 @@ struct ResourceType
   desc::String
   obtaining::Union{String, Nothing}
   rarity::Int8
-  sort_id::Int64
+  sort_id::Integer
 end
 
 function Base.show(io::IO, rt::ResourceType)
@@ -57,10 +57,10 @@ end
   Used primarily in PlayerData, but must be pre-defined for GameData
 """
 struct Resource
-  val::UInt64
+  val::Unsigned
   type::ResourceType
 
-  Resource(val, type) = new(Base.convert(UInt64, val), type)
+  Resource(val, type) = new(Base.convert(Unsigned, val), type)
 end
 
 function Base.show(io::IO, r::Resource)
@@ -102,9 +102,14 @@ end
 """
 """
 struct OperatorBase
-  id::Int64
+  id::String
   name::String
   rank::Int8
+
+  function OperatorBase(id::String, name::String, rank::Integer)
+    @assert 1 <= rank <= 6 "Rank must be between 1 and 6"
+    return new(id, name, Int8(rank))
+  end
 end
 
 """
@@ -152,15 +157,15 @@ end
 """
 """
 struct EnemyStats
-  id::Int64
+  id::Integer
   type::EnemyBase
-  level::Int64
-  hp::Int64
+  level::Integer
+  hp::Integer
   regen::Float64
-  atk::Int64
+  atk::Integer
   atk_int::Float64
   atk_radius::Float64
-  def::Int64
+  def::Integer
   res::Float64
   mov::Float64
   weight::Int8
@@ -202,18 +207,18 @@ struct Stage
   # meta
   sanity_cost::Resource
   plan_cost::Resource
-  rec_level::Int64
+  rec_level::Integer
   # combat
-  hp_seals::Int64
-  enemy_count::Int64
-  deployment_limit::Int64
-  initial_cp::Int64
-  max_cp::Int64
-  enemies::Dict{EnemyStats, Int64}
+  hp_seals::Integer
+  enemy_count::Integer
+  deployment_limit::Integer
+  initial_cp::Integer
+  max_cp::Integer
+  enemies::Dict{EnemyStats, Integer}
   map::Map
   # rewards
-  exp::Int64
-  trust::Int64
+  exp::Integer
+  trust::Integer
   lmd::Resource
   first_drops::Dict{ResourceType, DropRarity}
   regular_drops::Dict{ResourceType, DropRarity}
@@ -228,23 +233,53 @@ end
 """
 """
 struct OperatorLevel
-  level::Int16
+  level::Integer
   promotion::PromotionPhase
+  xp::Integer
+end
+
+function OperatorLevel(
+    level::Integer = 0,
+    promotion::PromotionPhase = e0,
+    xp::Integer = 0)
+  return OperatorLevel(level, promotion, xp)
+end
+
+"""
+"""
+struct OperatorSkills
+  rank::Integer
+  mastery_1::Integer
+  mastery_2::Integer
+  mastery_3::Integer
+end
+
+function OperatorSkills(; rank::Integer = 1,
+    m1::Integer = 0, m2::Integer = 0, m3::Integer = 0)
+  @assert 1 <= rank <= 7 "skill rank must be between 1 and 7"
+  for m in [m1, m2, m3]
+    @assert 0 <= m <= 3 "skill mastery must be between 0 and 3"
+  end
+  return OperatorSkills(rank, m1, m2, m3)
 end
 
 """
 """
 struct Operator
-  id::Int64
   base::OperatorBase
   level::OperatorLevel
-  trust::Int64
-  xp::Int64
-  skill_rank::Union{Int8, Nothing}
-  skill_1_mastery::Union{Int8, Nothing}
-  skill_2_mastery::Union{Int8, Nothing}
-  skill_3_mastery::Union{Int8, Nothing}
-  potential::Int8
+  skills::OperatorSkills
+  trust::Integer
+  potential::Integer
+end
+
+function Operator(
+    base::OperatorBase,
+    level::OperatorLevel = OperatorLevel(0, e0, 0),
+    skills::OperatorSkills = OperatorSkills(),
+    trust::Integer = 0,
+    potential::Integer = 0)
+  return Operator(base, level, skills, trust, potential)
 end
 
 """
@@ -253,10 +288,10 @@ struct StageReport
   id::String
   stars::Int8
   time::Dates.AbstractTime
-  exp::Int64
-  trust::Int64
+  exp::Integer
+  trust::Integer
   lmd::Resource
-  drops::Dict{ResourceType, Int64}
+  drops::Dict{ResourceType, Integer}
 end
 
 function Base.show(io::IO, sr::StageReport)

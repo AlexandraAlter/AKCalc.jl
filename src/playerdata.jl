@@ -5,7 +5,9 @@ using HTTP
 using DataFrames
 
 using AKCalc
+using AKCalc: GameData
 
+export operators, resources
 export PDSQLite
 
 include("playerdata_types.jl")
@@ -16,17 +18,18 @@ abstract type Source end
 function operators end
 function resources end
 
-struct SourceInMem <: Source
-  operators::DataFrame
-  resources::DataFrame
+mutable struct SourceInMem <: Source
+  operators::Union{Array{Operator}, Nothing}
+  resources::Union{Array{Resource}, Nothing}
 end
+SourceInMem() = SourceInMem(nothing, nothing)
 
-operators(pd::SourceInMem) = pd.operators::DataFrame
-resources(pd::SourceInMem) = pd.resources::DataFrame
+operators(pd::SourceInMem) = pd.operators
+resources(pd::SourceInMem) = pd.resources
 
 include("playerdata_sqlite.jl")
 
-PDSQLite(file) = SourceInSQL(file)
+const PDSQLite = SourceInSQL
 
 end
 
